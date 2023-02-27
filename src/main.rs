@@ -12,7 +12,7 @@ error_chain! {
 }
 
 fn main() -> Result<()> {
-    let file = File::open("archive.tar.gz")?;
+    let file = File::open("takeout.tgz")?;
     let mut archive = Archive::new(GzDecoder::new(file));
     let prefix = "bundle/logs";
 
@@ -21,6 +21,8 @@ fn main() -> Result<()> {
         .entries()?
         .filter_map(|e| e.ok())
         .map(|mut entry| -> Result<PathBuf> {
+            let path2 = entry.path()?.to_owned();
+            println!("Path: {}",path2.display());
             let path = entry.path()?.strip_prefix(prefix)?.to_owned();
             entry.unpack(&path)?;
             Ok(path)
