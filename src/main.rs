@@ -3,7 +3,6 @@ use flate2::read::GzDecoder;
 use serde_json;
 use std::fs::File;
 use std::path::Path;
-use std::path::PathBuf;
 use tar::Archive;
 
 error_chain! {
@@ -27,12 +26,11 @@ fn main() -> Result<()> {
             let path2 = entry.path().unwrap().to_owned();
             println!("Path: {}", path2.display());
 
-            // let deserializer = serde_json::Deserializer::from_reader(entry);
-            // let iterator = deserializer.into_iter::<serde_json::Value>();
-            // for item in iterator {
-            //     println!("Got {:?}", item.unwrap());
-            // }
-
+            let deserializer = serde_json::Deserializer::from_reader(entry);
+            let iterator = deserializer.into_iter::<serde_json::Value>();
+            for item in iterator {
+                println!("Got {:?}", item.unwrap());
+            }
         });
 
     Ok(())
