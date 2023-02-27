@@ -1,6 +1,8 @@
 use error_chain::error_chain;
 use flate2::read::GzDecoder;
+use serde_json;
 use std::fs::File;
+use std::path::Path;
 use std::path::PathBuf;
 use tar::Archive;
 
@@ -14,21 +16,24 @@ error_chain! {
 fn main() -> Result<()> {
     let file = File::open("takeout.tgz")?;
     let mut archive = Archive::new(GzDecoder::new(file));
-    let prefix = "bundle/logs";
+    let records_file_path = Path::new("Takeout/Location History/Records.json");
 
     println!("Extracted the following files:");
     archive
         .entries()?
         .filter_map(|e| e.ok())
-        .map(|mut entry| -> Result<PathBuf> {
-            let path2 = entry.path()?.to_owned();
-            println!("Path: {}",path2.display());
-            let path = entry.path()?.strip_prefix(prefix)?.to_owned();
-            entry.unpack(&path)?;
-            Ok(path)
-        })
-        .filter_map(|e| e.ok())
-        .for_each(|x| println!("> {}", x.display()));
+        .filter(|entry| records_file_path == entry.path().unwrap())
+        .for_each(|entry| {
+            let path2 = entry.path().unwrap().to_owned();
+            println!("Path: {}", path2.display());
+
+            // let deserializer = serde_json::Deserializer::from_reader(entry);
+            // let iterator = deserializer.into_iter::<serde_json::Value>();
+            // for item in iterator {
+            //     println!("Got {:?}", item.unwrap());
+            // }
+
+        });
 
     Ok(())
 }
