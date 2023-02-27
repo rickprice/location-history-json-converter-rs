@@ -27,7 +27,9 @@ fn main() -> Result<()> {
             println!("Path: {}", path2.display());
 
             let deserializer = serde_json::Deserializer::from_reader(entry);
+            println!("Created deserializer");
             let iterator = deserializer.into_iter::<serde_json::Value>();
+            println!("Created iterator");
             for item in iterator {
                 println!("Got {:?}", item.unwrap());
             }
